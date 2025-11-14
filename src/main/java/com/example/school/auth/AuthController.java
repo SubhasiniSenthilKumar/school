@@ -31,7 +31,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity submit(@RequestBody  UserRequest request){
         Map<String, Object> response = new HashMap<>();
-        if (authService.findByName(request.getUsername()).isPresent()) {
+        if (authService.findByEmail(request.getEmail()).isPresent()) {
             response.put("status", "error");
             response.put("message", "UserName already exists!");
             response.put("data", null);
@@ -75,16 +75,15 @@ public class AuthController {
     }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest request) {
-        Optional<Register> user = authService.findByName(request.getUsername());
+        Optional<Register> user = authService.findByEmail(request.getEmail());
         System.out.println("Raw password: '" + request.getPassword() + "'"+"user"+user.get());
         System.out.println("Hashed password: '" + user.get().getPassword() + "'");
         System.out.println("Password match: " + passwordEncoder.matches(request.getPassword(), user.get().getPassword()));
-
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> data = new HashMap<>();
         if (user.isPresent() && passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
 
-            UserDetails userDetail = userDetailsService.loadUserByUsername(request.getUsername());
+            UserDetails userDetail = userDetailsService.loadUserByUsername(request.getEmail());
 
 
 

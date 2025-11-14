@@ -9,8 +9,8 @@ import java.util.Optional;
 public class AuthService {
 
     @Autowired AuthRep authRep;
-    public Optional<Register> findByName(String name) {
-        return authRep.findByUsername(name);
+    public Optional<Register> findByEmail(String email) {
+        return authRep.findByEmail(email);
     }
     public void saves(Register reg) {
         authRep.save(reg);

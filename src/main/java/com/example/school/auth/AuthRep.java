@@ -7,5 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface AuthRep extends JpaRepository<Register,Long> {
+    Optional<Register> findByEmail(String email);
     Optional<Register> findByUsername(String name);
 }
