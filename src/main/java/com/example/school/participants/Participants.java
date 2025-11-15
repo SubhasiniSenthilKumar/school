@@ -15,10 +15,18 @@ public class Participants {
     @Column(name = "id")
     private Long id;
 
-    private String name;
-    private LocalDate dob;
+    private String participantName;
+
+    private LocalDate dateOfBirth;
     private Long age;
-    private String std;
+    private String gender;
+    private String category;
+    private String schoolName;
+    private String standard;
+    private String yogaMasterName;
+    private Long yogaMasterContact;
     private String address;
+
+    private String photo; // to store image filename
 
 }

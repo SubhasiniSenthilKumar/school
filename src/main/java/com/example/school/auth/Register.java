@@ -12,8 +12,6 @@ public class Register {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-
     private String username;
     private String email;
     private String password;

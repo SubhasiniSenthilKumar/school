@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -159,12 +156,51 @@ public class AuthController {
 //return ResponseEntity.status(401).body(Collections.singletonMap("error", "Invalid credentials"));
         }
     }
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        Map<String, Object> response = new HashMap<>();
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logout() {
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("status", "success");
+//        response.put("message", "Logged out successfully");
+//        return ResponseEntity.ok(response);
+//        //return ResponseEntity.ok(Collections.singletonMap("message", "Logged out successfully"));
+//    }
+//@PostMapping("/logout")
+//public ResponseEntity<Map<String, Object>> logout(@RequestHeader(value = "Authorization", required = false) String token) {
+//    if (token != null && token.startsWith("Bearer ")) {
+//        String jwtToken = token.substring(7);
+//        // TODO: Add token to blacklist if implementing server-side invalidation
+//    }
+//
+//    Map<String, Object> data = new HashMap<>();
+//    data.put("tokenInvalidated", token != null);
+//
+//    Map<String, Object> response = new HashMap<>();
+//    response.put("status", "success");
+//    response.put("message", "Logged out successfully");
+//    response.put("data", data);
+//
+//    return ResponseEntity.ok(response);
+//}
+@PostMapping("/logout")
+public ResponseEntity<Map<String, Object>> logout(@RequestHeader(value = "Authorization") String token) {
+    Map<String, Object> response = new HashMap<>();
+    Map<String, Object> data = new HashMap<>();
+
+    if (token != null && token.startsWith("Bearer ")) {
+        String jwtToken = token.substring(7);
+        // TODO: Add token to blacklist if implementing server-side invalidation
+        data.put("tokenInvalidated", true);
         response.put("status", "success");
         response.put("message", "Logged out successfully");
+        response.put("data", data);
         return ResponseEntity.ok(response);
-        //return ResponseEntity.ok(Collections.singletonMap("message", "Logged out successfully"));
+    } else {
+        data.put("tokenInvalidated", false);
+        response.put("status", "fail");
+        response.put("message", "No valid token provided");
+        response.put("data", data);
+        return ResponseEntity.status(400).body(response); // 400 Bad Request
     }
+}
+
 }

@@ -20,10 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Register reg = regRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"+email));
 
         return new CustomUserDetails(
-                reg.getUsername(),
+                reg.getEmail(),
                 reg.getPassword(),
                 true, true, true, true,
                 Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")),
