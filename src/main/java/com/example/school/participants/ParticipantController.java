@@ -138,7 +138,7 @@ public ResponseEntity<Map<String, Object>> submitData(
     }
 
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<Map<String, Object>>  getFilteredTax(@RequestBody PageFilterRequest filter) {
         Map<String, Object> response = new HashMap<>();
 
