@@ -37,7 +37,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("http://localhost:4200", "http://localhost:8083")
+                .allowedOriginPatterns("http://localhost:4200", "http://localhost:8083","http://localhost:*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true)
@@ -52,7 +52,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/auth/**").permitAll()
+                        .requestMatchers( "/auth/**","/participants/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -22,63 +22,53 @@ public class AuthController {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private CustomUserDetailsService userDetailsService;
-    @Autowired
-    private RoleRep roleRep;
+
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @PostMapping("/register")
-    public ResponseEntity submit(@RequestBody  UserRequest request){
+    public ResponseEntity<?> submit(@RequestBody UserRequest request) {
+
         Map<String, Object> response = new HashMap<>();
-        if (authService.findByEmail(request.getEmail()).isPresent()) {
+
+        try {
+            // Check if email exists
+            if (authService.findByEmail(request.getEmail()).isPresent()) {
+                response.put("status", "error");
+                response.put("message", "UserName already exists!");
+                response.put("data", null);
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Save user through service
+            Register savedUser = authService.saveUser(request);
+
+            // Build response data
+            Map<String, Object> user = new HashMap<>();
+            user.put("email", savedUser.getEmail());
+            user.put("username", savedUser.getUsername());
+            user.put("phone_no", savedUser.getPhoneNo());
+            user.put("role_id", savedUser.getRole() != null ? savedUser.getRole().getId() : null);
+            user.put("role_name", savedUser.getRole() != null ? savedUser.getRole().getName() : null);
+            user.put("id", savedUser.getId());
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("user", user);
+
+            // Final response
+            response.put("status", "success");
+            response.put("message", "Data saved successfully!");
+            response.put("data", data);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
             response.put("status", "error");
-            response.put("message", "UserName already exists!");
+            response.put("message", e.getMessage());
             response.put("data", null);
             return ResponseEntity.badRequest().body(response);
-           // return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Name already exists!"));
         }
-
-        Register newUser=new Register();
-        newUser.setPhoneNo(request.getPhoneNo());
-        if ("user".equalsIgnoreCase(request.getRole())) {
-            Role userRole = roleRep.findByName("USER")
-                    .orElseThrow(() -> new RuntimeException("Role not found"));
-
-            newUser.setRole(userRole); // set the role object to the user
-
-        }
-
-        newUser.setEmail(request.getEmail());
-        newUser.setUsername(request.getUsername());
-        newUser.setAccepted(false);
-
-//        Role role=roleRep.findById()
-//        newUser.setRole();
-
-        newUser.setPassword(passwordEncoder.encode(request.getPassword())); // ✅ Hash password before saving
-        newUser.setConfirmPassword(request.getPassword());
-        authService.saves(newUser);
-       // return ResponseEntity.ok(Collections.singletonMap("message", "Data saved successfully!"));
-        Map<String, Object> data = new HashMap<>();
-        Map<String, Object> user = new HashMap<>();
-
-        user.put("email", newUser.getEmail());
-        user.put("username", newUser.getUsername());
-        user.put("phone_no",newUser.getPhoneNo());
-        user.put("role_id", newUser.getRole() != null ? newUser.getRole().getId() : null);
-        if (newUser.getRole() != null) {
-            String roleName = newUser.getRole().getName(); // branch name for other roles
-
-            user.put("role_name", roleName);
-        }
-        user.put("id",newUser.getId());
-        data.put("user",user);
-
-        // Build response
-        response.put("status", "success");
-        response.put("message", "Data saved successfully!");
-        response.put("data", data);
-
-        return ResponseEntity.ok(response);
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest request) {
         Optional<Register> user = authService.findByEmail(request.getEmail());
@@ -106,26 +96,6 @@ public class AuthController {
                 }
             }
 
-//            Map<String,Object> response = new HashMap<>();
-//            response.put("message", "Login successful");
-//            response.put("username", user.get().getName());
-//
-//            response.put("token", token);
-//            response.put("token_type", "Bearer");
-//            response.put("name", adminOrRoleName);
-//            response.put("role_id", user.get().getRole() != null ? user.get().getRole().getId() : null); // ✅ correc
-//            data.put("username", user.get().getUsername());
-//            data.put("email",user.get().getEmail());
-//            data.put("phone_no",user.get().getPhoneNo());
-//            data.put("token", token);
-//            data.put("token_type", "Bearer");
-//            data.put("role_name", adminOrRoleName);
-//            data.put("role_id", user.get().getRole() != null ? user.get().getRole().getId() : null);
-//
-//            // ✅ top-level structure
-//            response.put("status", "success");
-//            response.put("message", "Login successful");
-//            response.put("data", data);
 
             Map<String, Object> userDetails = new HashMap<>();
             userDetails.put("username", user.get().getUsername());
@@ -156,31 +126,7 @@ public class AuthController {
 //return ResponseEntity.status(401).body(Collections.singletonMap("error", "Invalid credentials"));
         }
     }
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logout() {
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("status", "success");
-//        response.put("message", "Logged out successfully");
-//        return ResponseEntity.ok(response);
-//        //return ResponseEntity.ok(Collections.singletonMap("message", "Logged out successfully"));
-//    }
-//@PostMapping("/logout")
-//public ResponseEntity<Map<String, Object>> logout(@RequestHeader(value = "Authorization", required = false) String token) {
-//    if (token != null && token.startsWith("Bearer ")) {
-//        String jwtToken = token.substring(7);
-//        // TODO: Add token to blacklist if implementing server-side invalidation
-//    }
-//
-//    Map<String, Object> data = new HashMap<>();
-//    data.put("tokenInvalidated", token != null);
-//
-//    Map<String, Object> response = new HashMap<>();
-//    response.put("status", "success");
-//    response.put("message", "Logged out successfully");
-//    response.put("data", data);
-//
-//    return ResponseEntity.ok(response);
-//}
+
 @PostMapping("/logout")
 public ResponseEntity<Map<String, Object>> logout(@RequestHeader(value = "Authorization") String token) {
     Map<String, Object> response = new HashMap<>();
@@ -202,5 +148,65 @@ public ResponseEntity<Map<String, Object>> logout(@RequestHeader(value = "Author
         return ResponseEntity.status(400).body(response); // 400 Bad Request
     }
 }
+
+
+
+
+
+
+//    @PostMapping("/register")
+//    public ResponseEntity submit(@RequestBody  UserRequest request){
+//        Map<String, Object> response = new HashMap<>();
+//        if (authService.findByEmail(request.getEmail()).isPresent()) {
+//            response.put("status", "error");
+//            response.put("message", "UserName already exists!");
+//            response.put("data", null);
+//            return ResponseEntity.badRequest().body(response);
+//            // return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Name already exists!"));
+//        }
+//
+//        Register newUser=new Register();
+//        newUser.setPhoneNo(request.getPhoneNo());
+//        if ("user".equalsIgnoreCase(request.getRole())) {
+//            Role userRole = roleRep.findByName("USER")
+//                    .orElseThrow(() -> new RuntimeException("Role not found"));
+//
+//            newUser.setRole(userRole); // set the role object to the user
+//
+//        }
+//
+//        newUser.setEmail(request.getEmail());
+//        newUser.setUsername(request.getUsername());
+//        newUser.setAccepted(false);
+//
+////        Role role=roleRep.findById()
+////        newUser.setRole();
+//
+//        newUser.setPassword(passwordEncoder.encode(request.getPassword())); // ✅ Hash password before saving
+//        newUser.setConfirmPassword(request.getPassword());
+//        authService.saves(newUser);
+//        // return ResponseEntity.ok(Collections.singletonMap("message", "Data saved successfully!"));
+//        Map<String, Object> data = new HashMap<>();
+//        Map<String, Object> user = new HashMap<>();
+//
+//        user.put("email", newUser.getEmail());
+//        user.put("username", newUser.getUsername());
+//        user.put("phone_no",newUser.getPhoneNo());
+//        user.put("role_id", newUser.getRole() != null ? newUser.getRole().getId() : null);
+//        if (newUser.getRole() != null) {
+//            String roleName = newUser.getRole().getName(); // branch name for other roles
+//
+//            user.put("role_name", roleName);
+//        }
+//        user.put("id",newUser.getId());
+//        data.put("user",user);
+//
+//        // Build response
+//        response.put("status", "success");
+//        response.put("message", "Data saved successfully!");
+//        response.put("data", data);
+//
+//        return ResponseEntity.ok(response);
+//    }
 
 }

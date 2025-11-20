@@ -78,22 +78,10 @@ public class ParticipantService {
         return participantRep.save(participant); // save and return updated entity
     }
 
-    public List<Participants> getAllParticipants() {
-        return participantRep.findByStatus("Accepted"); // only accepted
-    }
-
-    //    public Page<Participants> getFiltered(PageFilterRequest filter) {
-//        Pageable pageable = filter.toPageable();
-//
-//        if (filter.getParticipantName() == null || filter.getParticipantName().isEmpty()) {
-//
-//
-//            return participantRep.findAllExcludingStatus("Rejected", pageable);
-//        } else {
-//            return participantRep.findByNameExcludingStatus(filter.getParticipantName(),"Rejected", pageable);
-//        }
+//    public List<Participants> getAllParticipants() {
+//        return participantRep.findByStatus("Accepted"); // only accepted
 //    }
-//}
+
     public Page<Participants> getFiltered(PageFilterRequest filter) {
         Pageable pageable = filter.toPageable();
         String name = filter.getParticipantName();

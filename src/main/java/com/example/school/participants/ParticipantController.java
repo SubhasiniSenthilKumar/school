@@ -137,49 +137,6 @@ public ResponseEntity<Map<String, Object>> submitData(
         }
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<Map<String, Object>> getAllParticipants() {
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            List<Participants> participantsList = participantService.getAllParticipants();
-
-            List<Map<String, Object>> users = new ArrayList<>();
-            for (Participants p : participantsList) {
-                Map<String, Object> userMap = new HashMap<>();
-                userMap.put("id", p.getId());
-                userMap.put("participantName", p.getParticipantName());
-                userMap.put("dateOfBirth", p.getDateOfBirth());
-                userMap.put("age", p.getAge());
-                userMap.put("gender", p.getGender());
-                userMap.put("category", p.getCategory());
-                userMap.put("schoolName", p.getSchoolName());
-                userMap.put("standard", p.getStandard());
-                userMap.put("yogaMasterName", p.getYogaMasterName());
-                userMap.put("yogaMasterContact", p.getYogaMasterContact());
-                userMap.put("address", p.getAddress());
-                userMap.put("photo", p.getPhoto());
-                userMap.put("status",p.getStatus());
-
-                users.add(userMap);
-            }
-
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("users", users); // list of all participants
-
-            response.put("status", "success");
-            response.put("message", "Participants retrieved successfully!");
-            response.put("data", dataMap);
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.put("status", "error");
-            response.put("message", "Error retrieving participants!");
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
 
     @GetMapping
     public ResponseEntity<Map<String, Object>>  getFilteredTax(@RequestBody PageFilterRequest filter) {
@@ -207,4 +164,50 @@ public ResponseEntity<Map<String, Object>> submitData(
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+//    @GetMapping("/list")
+//    public ResponseEntity<Map<String, Object>> getAllParticipants() {
+//        Map<String, Object> response = new HashMap<>();
+//
+//        try {
+//            List<Participants> participantsList = participantService.getAllParticipants();
+//
+//            List<Map<String, Object>> users = new ArrayList<>();
+//            for (Participants p : participantsList) {
+//                Map<String, Object> userMap = new HashMap<>();
+//                userMap.put("id", p.getId());
+//                userMap.put("participantName", p.getParticipantName());
+//                userMap.put("dateOfBirth", p.getDateOfBirth());
+//                userMap.put("age", p.getAge());
+//                userMap.put("gender", p.getGender());
+//                userMap.put("category", p.getCategory());
+//                userMap.put("schoolName", p.getSchoolName());
+//                userMap.put("standard", p.getStandard());
+//                userMap.put("yogaMasterName", p.getYogaMasterName());
+//                userMap.put("yogaMasterContact", p.getYogaMasterContact());
+//                userMap.put("address", p.getAddress());
+//                userMap.put("photo", p.getPhoto());
+//                userMap.put("status",p.getStatus());
+//
+//                users.add(userMap);
+//            }
+//
+//            Map<String, Object> dataMap = new HashMap<>();
+//            dataMap.put("users", users); // list of all participants
+//
+//            response.put("status", "success");
+//            response.put("message", "Participants retrieved successfully!");
+//            response.put("data", dataMap);
+//
+//            return ResponseEntity.ok(response);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            response.put("status", "error");
+//            response.put("message", "Error retrieving participants!");
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//    }
+
+
 }
